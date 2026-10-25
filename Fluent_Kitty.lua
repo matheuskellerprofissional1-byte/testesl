@@ -4038,34 +4038,32 @@ function Element:New(Idx, Config)
 		SliderRail,
 	})
 
-	Creator.AddSignal(SliderDot.InputBegan, function(Input)
-		if
-			Input.UserInputType == Enum.UserInputType.MouseButton1
-			or Input.UserInputType == Enum.UserInputType.Touch
-		then
+	local function startDrag(Input)
+		if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
 			Dragging = true
+			local SizeScale = math.clamp((Input.Position.X - SliderRail.AbsolutePosition.X) / SliderRail.AbsoluteSize.X, 0, 1)
+			Slider:SetValue(Slider.Min + ((Slider.Max - Slider.Min) * SizeScale))
 		end
-	end)
+	end
 
-	Creator.AddSignal(SliderDot.InputEnded, function(Input)
-		if
-			Input.UserInputType == Enum.UserInputType.MouseButton1
-			or Input.UserInputType == Enum.UserInputType.Touch
-		then
+	local function endDrag(Input)
+		if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
 			Dragging = false
 		end
-	end)
+	end
+
+	Creator.AddSignal(SliderDot.InputBegan, startDrag)
+	Creator.AddSignal(SliderDot.InputEnded, endDrag)
+	Creator.AddSignal(SliderRail.InputBegan, startDrag)
+	Creator.AddSignal(SliderRail.InputEnded, endDrag)
+	Creator.AddSignal(SliderFill.InputBegan, startDrag)
+	Creator.AddSignal(SliderFill.InputEnded, endDrag)
+	Creator.AddSignal(SliderInner.InputBegan, startDrag)
+	Creator.AddSignal(SliderInner.InputEnded, endDrag)
 
 	Creator.AddSignal(UserInputService.InputChanged, function(Input)
-		if
-			Dragging
-			and (
-				Input.UserInputType == Enum.UserInputType.MouseMovement
-				or Input.UserInputType == Enum.UserInputType.Touch
-			)
-		then
-			local SizeScale =
-				math.clamp((Input.Position.X - SliderRail.AbsolutePosition.X) / SliderRail.AbsoluteSize.X, 0, 1)
+		if Dragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
+			local SizeScale = math.clamp((Input.Position.X - SliderRail.AbsolutePosition.X) / SliderRail.AbsoluteSize.X, 0, 1)
 			Slider:SetValue(Slider.Min + ((Slider.Max - Slider.Min) * SizeScale))
 		end
 	end)
@@ -5992,10 +5990,7 @@ function Element:New(Idx, Config)
 	end)
 
 	local function isWhitelisted(userId)
-		for _, uid in ipairs(WhitelistList.Whitelist) do
-			if uid == userId then return true end
-		end
-		return false
+		return WhitelistList.Whitelist[userId] == true
 	end
 
 	local function getCharacterName(char)
@@ -6129,14 +6124,9 @@ function Element:New(Idx, Config)
 
 			Creator.AddSignal(ToggleBtn.MouseButton1Click, function()
 				if inWhitelist then
-					for i, uid in ipairs(WhitelistList.Whitelist) do
-						if uid == userId then
-							table.remove(WhitelistList.Whitelist, i)
-							break
-						end
-					end
+					WhitelistList.Whitelist[userId] = nil
 				else
-					table.insert(WhitelistList.Whitelist, userId)
+					WhitelistList.Whitelist[userId] = true
 				end
 				WhitelistList:Refresh()
 				Library:SafeCallback(WhitelistList.OnToggle, userId, not inWhitelist)
