@@ -4428,16 +4428,16 @@ function Element:New(Idx, Config)
 				ButtonSelector.Size = UDim2.new(0, 4, 0, value)
 			end)
 
-			Creator.AddSignal(Button.MouseEnter, function()
+			Button.MouseEnter:Connect(function()
 				SetBackTransparency(Selected and 0.85 or 0.89)
 			end)
-			Creator.AddSignal(Button.MouseLeave, function()
+			Button.MouseLeave:Connect(function()
 				SetBackTransparency(Selected and 0.89 or 1)
 			end)
-			Creator.AddSignal(Button.MouseButton1Down, function()
+			Button.MouseButton1Down:Connect(function()
 				SetBackTransparency(0.92)
 			end)
-			Creator.AddSignal(Button.MouseButton1Up, function()
+			Button.MouseButton1Up:Connect(function()
 				SetBackTransparency(Selected and 0.85 or 0.89)
 			end)
 
@@ -5756,7 +5756,7 @@ function Element:New(Idx, Config)
 				}),
 			})
 
-			Creator.AddSignal(EnemyBtn.MouseButton1Click, function()
+			EnemyBtn.MouseButton1Click:Connect(function()
 				if isEnemy(userId) then
 					PlayerList.Enemies[userId] = nil
 				else
@@ -5767,7 +5767,7 @@ function Element:New(Idx, Config)
 				Library:SafeCallback(PlayerList.OnEnemyToggle, userId, PlayerList.Enemies[userId] == true)
 			end)
 
-			Creator.AddSignal(AllyBtn.MouseButton1Click, function()
+			AllyBtn.MouseButton1Click:Connect(function()
 				if isAlly(userId) then
 					PlayerList.Allies[userId] = nil
 				else
@@ -6133,7 +6133,7 @@ function Element:New(Idx, Config)
 				}),
 			})
 
-			Creator.AddSignal(ToggleBtn.MouseButton1Click, function()
+			ToggleBtn.MouseButton1Click:Connect(function()
 				if inWhitelist then
 					WhitelistList.Whitelist[userId] = nil
 				else
