@@ -5788,16 +5788,26 @@ function Element:New(Idx, Config)
 		PlayerList:Refresh()
 	end)
 
+	local refreshDebounce = false
+
 	Creator.AddSignal(Players.PlayerAdded, function()
-		task.wait(0.5)
-		PlayerList:Refresh()
+		if refreshDebounce then return end
+		refreshDebounce = true
+		task.delay(1, function()
+			refreshDebounce = false
+			PlayerList:Refresh()
+		end)
 	end)
 
 	Creator.AddSignal(Players.PlayerRemoving, function(player)
 		PlayerList.Enemies[player.UserId] = nil
 		PlayerList.Allies[player.UserId] = nil
-		task.wait(0.1)
-		PlayerList:Refresh()
+		if refreshDebounce then return end
+		refreshDebounce = true
+		task.delay(0.5, function()
+			refreshDebounce = false
+			PlayerList:Refresh()
+		end)
 	end)
 
 	function PlayerList:SetEnemies(enemies)
@@ -6143,20 +6153,25 @@ function Element:New(Idx, Config)
 		WhitelistList:Refresh()
 	end)
 
+	local refreshDebounce = false
+
 	Creator.AddSignal(Players.PlayerAdded, function()
-		task.wait(0.5)
-		WhitelistList:Refresh()
+		if refreshDebounce then return end
+		refreshDebounce = true
+		task.delay(1, function()
+			refreshDebounce = false
+			WhitelistList:Refresh()
+		end)
 	end)
 
 	Creator.AddSignal(Players.PlayerRemoving, function(player)
-		for i, uid in ipairs(WhitelistList.Whitelist) do
-			if uid == player.UserId then
-				table.remove(WhitelistList.Whitelist, i)
-				break
-			end
-		end
-		task.wait(0.1)
-		WhitelistList:Refresh()
+		WhitelistList.Whitelist[player.UserId] = nil
+		if refreshDebounce then return end
+		refreshDebounce = true
+		task.delay(0.5, function()
+			refreshDebounce = false
+			WhitelistList:Refresh()
+		end)
 	end)
 
 	function WhitelistList:SetWhitelist(whitelist)
